@@ -1,6 +1,6 @@
 ﻿namespace LocalCandleBuffer
 {
-	internal class BufferManifest
+	internal class BufferManifest<TCandle> where TCandle : IStorableCandle<TCandle>
 	{
 		private readonly string _filePath;
 		private Dictionary<string, CandleRange>? _ranges;
@@ -20,7 +20,7 @@
 		}
 
 
-		public void UpdateRangeData(string symbol, IList<ICandleF> candles)
+		public void UpdateRangeData(string symbol, IList<TCandle> candles)
 		{
 			if (candles.Count == 0)
 			{
@@ -37,12 +37,6 @@
 			if (_ranges!.ContainsKey(symbolId))
 			{
 				CandleRange oldRange = _ranges[symbolId];
-				/*if (
-					oldRange.DoesTouch(newRange) == false
-				)
-				{
-					throw new Exception("Ranges must touch each other");
-				}*/
 
 				DateTime newStart, newEnd;
 				if (newRange.StartUTC < oldRange.StartUTC)

@@ -1,30 +1,30 @@
-﻿using LocalCandleBuffer.Helpers;
-
-namespace LocalCandleBuffer
+﻿namespace LocalCandleBuffer
 {
-	public class BinaryCandleStorage
+	internal class BinaryCandleStorage<TCandle> where TCandle : IStorableCandle<TCandle>
 	{
 		private readonly string _path;
+		private readonly ICandleWritterReader<TCandle> _readerWriter;
 
 
-		public BinaryCandleStorage(string path)
+		internal BinaryCandleStorage(ICandleWritterReader<TCandle> candleReaderWriter, string path)
 		{
 			_path = path;
+			_readerWriter = candleReaderWriter;
 		}
 
 
-		public IList<ICandleF> Read(CandleRange req)
+		public IList<TCandle> Read(CandleRange req)
 		{
 			if (File.Exists(_path) == false)
 			{
-				return Array.Empty<ICandleF>();
+				return Array.Empty<TCandle>();
 			}
 
 			using BinaryReader reader = new(File.Open(_path, FileMode.Open));
-			List<ICandleF> candles = new((int)(reader.BaseStream.Length / 24));
+			List<TCandle> candles = new((int)(reader.BaseStream.Length / 24));
 			while (reader.BaseStream.Position < reader.BaseStream.Length)
 			{
-				var candle = new StoredCandle(reader);
+				var candle = _readerWriter.ReadSingleCandleFromFile(reader);
 
 				if (candle.OpenUtc < req.StartUTC)
 				{
@@ -42,18 +42,18 @@ namespace LocalCandleBuffer
 		}
 
 
-		public IList<ICandleF> ReadAll()
+		public IList<TCandle> ReadAll()
 		{
 			if (File.Exists(_path) == false)
 			{
-				return Array.Empty<ICandleF>();
+				return Array.Empty<TCandle>();
 			}
 
 			using BinaryReader reader = new(File.Open(_path, FileMode.Open));
-			List<ICandleF> candles = new((int)(reader.BaseStream.Length / 24));
+			List<TCandle> candles = new((int)(reader.BaseStream.Length / 24));
 			while (reader.BaseStream.Position < reader.BaseStream.Length)
 			{
-				var candle = new StoredCandle(reader);
+				var candle = _readerWriter.ReadSingleCandleFromFile(reader);
 				candles.Add(candle);
 			}
 
@@ -61,7 +61,7 @@ namespace LocalCandleBuffer
 		}
 
 
-		public virtual void Save(IList<ICandleF> candles)
+		public virtual void Save(IList<TCandle> candles)
 		{
 			var oldCandles = ReadAll();
 			if (oldCandles.Count > 0)
@@ -72,47 +72,10 @@ namespace LocalCandleBuffer
 			using BinaryWriter writer = new(File.Open(_path, FileMode.Create));
 			foreach (var candle in candles)
 			{
-				StoredCandle.WriteToFile(candle, writer);
+				_readerWriter.WriteSingleCandleToFiler(candle, writer);
 			}
 
 			writer.Flush();
-		}
-
-
-		private class StoredCandle : ICandleF
-		{
-			public float Open { get; }
-			public float High { get; }
-			public float Low { get; }
-			public float Close { get; }
-			public long OpenUnixMc { get; }
-			public DateTime OpenUtc => DateTimeEx.FromUnixTimeMilliseconds(OpenUnixMc);
-			public float VolumeBase { get; }
-			public float VolumeQuote { get; }
-
-
-			public StoredCandle(BinaryReader r)
-			{
-				Open = r.ReadSingle();
-				High = r.ReadSingle();
-				Low = r.ReadSingle();
-				Close = r.ReadSingle();
-				OpenUnixMc = r.ReadInt64();
-				VolumeBase = r.ReadSingle();
-				VolumeQuote = r.ReadSingle();
-			}
-
-
-			public static void WriteToFile(ICandleF candle, BinaryWriter w)
-			{
-				w.Write(candle.Open);
-				w.Write(candle.High);
-				w.Write(candle.Low);
-				w.Write(candle.Close);
-				w.Write(candle.OpenUnixMc);
-				w.Write(candle.VolumeBase);
-				w.Write(candle.VolumeQuote);
-			}
 		}
 	}
 }

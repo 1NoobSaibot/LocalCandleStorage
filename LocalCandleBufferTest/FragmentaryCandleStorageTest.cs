@@ -1,5 +1,6 @@
 using LocalCandleBuffer;
 using LocalCandleBufferTest.Fakes;
+using LocalCandleBufferTest.Implementations;
 
 namespace LocalCandleBufferTest
 {
@@ -16,7 +17,7 @@ namespace LocalCandleBufferTest
 			var firstApiCandle = candles.First();
 			var lastApiCandle = candles.Last();
 
-			FragmentaryCandleStorage storage = new("testFragmentaryCandleFolderV2");
+			FragmentaryCandleStorage<Candle> storage = new(FakeExchangeApi.Instance, "testFragmentaryCandleFolderV2");
 			storage.Save(candles);
 			var readCandles = storage.Read(FakeExchangeApi.AvailableRange);
 			var firstStorageCandle = readCandles.First();

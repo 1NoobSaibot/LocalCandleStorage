@@ -1,15 +1,20 @@
 ﻿namespace LocalCandleBuffer
 {
-	internal class LimitedCandleStorage : BinaryCandleStorage
+	internal class LimitedCandleStorage<TCandle>
+		: BinaryCandleStorage<TCandle>
+		where TCandle : IStorableCandle<TCandle>
 	{
 		public readonly DateTime MinAvailableOpenUtc;
 		public readonly DateTime StrictMaxOpenUtc;
 
 
 		public LimitedCandleStorage(
-			string path, DateTime minAvailableOpenUtc, DateTime strictMaxOpenUtc
+			ICandleWritterReader<TCandle> readerWriter,
+			string path,
+			DateTime minAvailableOpenUtc,
+			DateTime strictMaxOpenUtc
 		)
-			: base(path)
+			: base(readerWriter, path)
 		{
 			if (
 				minAvailableOpenUtc.Kind != DateTimeKind.Utc
@@ -28,9 +33,9 @@
 		}
 
 
-		public override void Save(IList<ICandleF> candles)
+		public override void Save(IList<TCandle> candles)
 		{
-			List<ICandleF> selected = new(candles.Count);
+			List<TCandle> selected = new(candles.Count);
 			foreach (var candle in candles)
 			{
 				if (

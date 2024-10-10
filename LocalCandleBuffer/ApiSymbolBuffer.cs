@@ -1,13 +1,23 @@
 ﻿namespace LocalCandleBuffer
 {
-	public class ApiSymbolBufferV2 : ICandleSource
+	public interface ICandleWritterReader<TCandle> where TCandle : IStorableCandle<TCandle>
+	{
+		void WriteSingleCandleToFiler(TCandle candle, BinaryWriter writer);
+		TCandle ReadSingleCandleFromFile(BinaryReader reader);
+	}
+
+
+	public abstract class ApiSymbolBufferV2<TCandle>
+		: ICandleSource<TCandle>, ICandleWritterReader<TCandle>
+		where TCandle : IStorableCandle<TCandle>
 	{
 		private const string RANGES_FILE_NAME = "RangesInfo.bin";
 		private readonly string _root;
-		private readonly ICandleSource _alternativeSource;
-		private readonly BufferManifest _safeRanges;
+		private readonly ICandleSource<TCandle> _alternativeSource;
+		private readonly BufferManifest<TCandle> _safeRanges;
 
-		public ApiSymbolBufferV2(string root, ICandleSource alternativeSource)
+
+		public ApiSymbolBufferV2(string root, ICandleSource<TCandle> alternativeSource)
 		{
 			_root = root;
 			_alternativeSource = alternativeSource;
@@ -16,7 +26,7 @@
 		}
 
 
-		public async Task<IList<ICandleF>> Get1mCandlesSpot(
+		public async Task<IList<TCandle>> Get1mCandlesSpot(
 			string symbol,
 			CandleRange? req,
 			Action<int, int>? tellProgress = null
@@ -26,6 +36,10 @@
 			await BufferizeMissedCandlesIfNeed(symbol, req, tellProgress);
 			return GetFromBuffer(symbol, req);
 		}
+
+
+		public abstract void WriteSingleCandleToFiler(TCandle candle, BinaryWriter writer);
+		public abstract TCandle ReadSingleCandleFromFile(BinaryReader reader);
 
 
 		private async Task BufferizeMissedCandlesIfNeed(
@@ -71,7 +85,7 @@
 		}
 
 
-		private IList<ICandleF> GetFromBuffer(string symbol, CandleRange req)
+		private IList<TCandle> GetFromBuffer(string symbol, CandleRange req)
 		{
 			var storage = SymbolToStorage(symbol);
 			var candles = storage.Read(req);
@@ -79,7 +93,7 @@
 		}
 
 
-		private void Save(string symbol, IList<ICandleF> candlesToSave)
+		private void Save(string symbol, IList<TCandle> candlesToSave)
 		{
 			var storage = SymbolToStorage(symbol);
 			storage.Save(candlesToSave);
@@ -87,10 +101,10 @@
 		}
 
 
-		private FragmentaryCandleStorage SymbolToStorage(string symbol)
+		private FragmentaryCandleStorage<TCandle> SymbolToStorage(string symbol)
 		{
 			string storagePath = Path.Combine(_root, symbol);
-			return new FragmentaryCandleStorage(storagePath);
+			return new FragmentaryCandleStorage<TCandle>(this, storagePath);
 		}
 	}
 }

@@ -2,28 +2,32 @@
 
 namespace LocalCandleBuffer
 {
-	public class FragmentaryCandleStorage
+	internal class FragmentaryCandleStorage<TCandle> where TCandle : IStorableCandle<TCandle>
 	{
 		private readonly string _root;
+		private readonly ICandleWritterReader<TCandle> _readerWriter;
 
 
-		public FragmentaryCandleStorage(string pathToFolder)
+		public FragmentaryCandleStorage(
+			ICandleWritterReader<TCandle> readerWriter,
+			string pathToFolder)
 		{
 			_root = pathToFolder;
+			_readerWriter = readerWriter;
 			Directory.CreateDirectory(_root);
 		}
 
 
-		public IList<ICandleF> Read(CandleRange req)
+		public IList<TCandle> Read(CandleRange req)
 		{
 			int expectedCandles = req.GetLengthInMinutes();
-			List<ICandleF> joined = new(expectedCandles);
+			List<TCandle> joined = new(expectedCandles);
 
 			DateTime indexYear = req.StartUTC.RoundDownToYear();
 			while (indexYear <= req.EndUTC)
 			{
-				LimitedCandleStorage fragStorage = DateToStorage(indexYear);
-				IList<ICandleF> chunk = fragStorage.Read(req);
+				LimitedCandleStorage<TCandle> fragStorage = DateToStorage(indexYear);
+				IList<TCandle> chunk = fragStorage.Read(req);
 				joined.AddRange(chunk);
 				indexYear = indexYear.AddYears(1);
 			}
@@ -32,7 +36,7 @@ namespace LocalCandleBuffer
 		}
 
 
-		public void Save(IList<ICandleF> candles)
+		public void Save(IList<TCandle> candles)
 		{
 			if (candles.Count == 0)
 			{
@@ -42,7 +46,7 @@ namespace LocalCandleBuffer
 			DateTime indexYear = candles[0].OpenUtc.RoundDownToYear();
 			do
 			{
-				LimitedCandleStorage yearStorage = DateToStorage(indexYear);
+				LimitedCandleStorage<TCandle> yearStorage = DateToStorage(indexYear);
 				yearStorage.Save(candles);
 
 				indexYear = indexYear.AddYears(1);
@@ -50,9 +54,10 @@ namespace LocalCandleBuffer
 		}
 
 
-		private LimitedCandleStorage DateToStorage(DateTime date)
+		private LimitedCandleStorage<TCandle> DateToStorage(DateTime date)
 		{
 			return new(
+				_readerWriter,
 				DateToFileName(date),
 				date,
 				date.AddYears(1)

@@ -1,5 +1,6 @@
 using LocalCandleBuffer;
 using LocalCandleBufferTest.Fakes;
+using LocalCandleBufferTest.Implementations;
 
 namespace LocalCandleBufferTest
 {
@@ -15,7 +16,7 @@ namespace LocalCandleBufferTest
 			Assert.IsNotNull(candles);
 			Assert.IsTrue(candles.Count >= 2);
 
-			BinaryCandleStorage storage = new("testCandles.bin");
+			BinaryCandleStorage<Candle> storage = new(FakeExchangeApi.Instance, "testCandles.bin");
 			storage.Save(candles);
 
 			var readCandles = storage.ReadAll();

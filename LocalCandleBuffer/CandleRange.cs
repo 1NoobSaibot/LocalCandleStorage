@@ -46,7 +46,7 @@ namespace LocalCandleBuffer
 		}
 
 
-		public bool InRange(ICandleF candle)
+		public bool InRange<TCandle>(TCandle candle) where TCandle : IStorableCandle<TCandle>
 		{
 			return candle.OpenUtc >= StartUTC && candle.OpenUtc <= EndUTC;
 		}
