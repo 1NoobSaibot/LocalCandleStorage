@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalCandleBuffer", "LocalCandleBuffer\LocalCandleBuffer.csproj", "{B398CACA-6E8A-464C-9E03-1312DFB1BCFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocalCandleBufferTest", "LocalCandleBufferTest\LocalCandleBufferTest.csproj", "{70515D54-51D8-4661-99D7-3CCF16A597CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B398CACA-6E8A-464C-9E03-1312DFB1BCFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B398CACA-6E8A-464C-9E03-1312DFB1BCFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B398CACA-6E8A-464C-9E03-1312DFB1BCFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B398CACA-6E8A-464C-9E03-1312DFB1BCFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70515D54-51D8-4661-99D7-3CCF16A597CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70515D54-51D8-4661-99D7-3CCF16A597CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70515D54-51D8-4661-99D7-3CCF16A597CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70515D54-51D8-4661-99D7-3CCF16A597CE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E55620FE-F72A-4894-AD18-96360594D092}
+	EndGlobalSection
+EndGlobal
