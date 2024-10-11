@@ -102,7 +102,7 @@ namespace LocalCandleBuffer
 			return frags;
 		}
 
-		internal static CandleRange AllByNow()
+		public static CandleRange AllByNow()
 		{
 			DateTime utcMinValue = new DateTime(1980, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 			return new(
