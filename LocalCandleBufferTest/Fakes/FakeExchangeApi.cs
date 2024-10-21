@@ -20,7 +20,7 @@ namespace LocalCandleBufferTest.Fakes
 		}
 
 
-		public Task<IList<Candle>> Get1mCandlesSpot(
+		public Task<IList<Candle>> Get1mCandles(
 			string symbolId,
 			CandleRange? req = null,
 			Action<int, int>? tellProgress = null

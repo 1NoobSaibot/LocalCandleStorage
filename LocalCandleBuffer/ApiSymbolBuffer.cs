@@ -26,7 +26,7 @@
 		}
 
 
-		public async Task<IList<TCandle>> Get1mCandlesSpot(
+		public async Task<IList<TCandle>> Get1mCandles(
 			string symbol,
 			CandleRange? req,
 			Action<int, int>? tellProgress = null
@@ -79,7 +79,7 @@
 		{
 			foreach (var range in ranges)
 			{
-				var candles = await _alternativeSource.Get1mCandlesSpot(symbol, range, tellProgress);
+				var candles = await _alternativeSource.Get1mCandles(symbol, range, tellProgress);
 				Save(symbol, candles);
 			}
 		}

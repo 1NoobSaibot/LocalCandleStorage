@@ -42,13 +42,13 @@ namespace LocalCandleBuffer
 
 		public int GetLengthInMinutes()
 		{
-			return (int)(EndUTC - StartUTC).TotalMinutes + 1;
+			return (int)(EndUTC - StartUTC).TotalMinutes;
 		}
 
 
 		public bool InRange<TCandle>(TCandle candle) where TCandle : IStorableCandle<TCandle>
 		{
-			return candle.OpenUtc >= StartUTC && candle.OpenUtc <= EndUTC;
+			return candle.OpenUtc >= StartUTC && candle.OpenUtc < EndUTC;
 		}
 
 
