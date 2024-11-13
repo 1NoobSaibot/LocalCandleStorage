@@ -26,7 +26,7 @@
 		}
 
 
-		public async Task<IList<TCandle>> Get1mCandles(
+		public async Task<Fragment<TCandle>> Get1mCandles(
 			string symbol,
 			CandleRange? req,
 			Action<int, int>? tellProgress = null
@@ -34,7 +34,9 @@
 		{
 			req ??= CandleRange.AllByNow();
 			await BufferizeMissedCandlesIfNeed(symbol, req, tellProgress);
-			return GetFromBuffer(symbol, req);
+			var candles = GetFromBuffer(symbol, req);
+			Fragment<TCandle> frag = new(candles.ToArray(), TimeFrame.OneMinute);
+			return frag;
 		}
 
 
@@ -80,7 +82,7 @@
 			foreach (var range in ranges)
 			{
 				var candles = await _alternativeSource.Get1mCandles(symbol, range, tellProgress);
-				Save(symbol, candles);
+				Save(symbol, candles.GetCandles());
 			}
 		}
 

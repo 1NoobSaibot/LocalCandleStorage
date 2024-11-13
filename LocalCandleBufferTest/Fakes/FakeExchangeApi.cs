@@ -5,7 +5,7 @@ namespace LocalCandleBufferTest.Fakes
 {
 	internal class FakeExchangeApi : ICandleSource<Candle>, ICandleWritterReader<Candle>
 	{
-		private const string FILE_NAME = "CandleExample_2023.bin";
+		private const string FILE_NAME = "../../../../CandleExample_2023.bin";
 		private readonly BinaryCandleStorage<Candle> _storage;
 		public static readonly FakeExchangeApi Instance = new FakeExchangeApi();
 		public static readonly CandleRange AvailableRange = new(
@@ -20,7 +20,7 @@ namespace LocalCandleBufferTest.Fakes
 		}
 
 
-		public Task<IList<Candle>> Get1mCandles(
+		public Task<Fragment<Candle>> Get1mCandles(
 			string symbolId,
 			CandleRange? req = null,
 			Action<int, int>? tellProgress = null
@@ -28,7 +28,8 @@ namespace LocalCandleBufferTest.Fakes
 		{
 			req ??= CandleRange.AllByNow();
 			var candles = _storage.Read(req);
-			return Task.FromResult(candles);
+			Fragment<Candle> frag = new(candles.ToArray(), TimeFrame.OneMinute);
+			return Task.FromResult(frag);
 		}
 
 
