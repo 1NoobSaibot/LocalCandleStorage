@@ -22,8 +22,7 @@ namespace LocalCandleBufferTest.Fakes
 
 		public Task<Fragment<Candle>> Get1mCandles(
 			string symbolId,
-			CandleRange? req = null,
-			Action<int, int>? tellProgress = null
+			CandleRange? req = null
 		)
 		{
 			req ??= CandleRange.AllByNow();

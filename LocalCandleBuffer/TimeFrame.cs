@@ -18,6 +18,12 @@
 		}
 
 
+		public bool IsValidDate(DateTime endDateUtc)
+		{
+			return (endDateUtc.Ticks % AsTimeSpan.Ticks) == 0;
+		}
+
+
 		public static bool operator ==(TimeFrame l, TimeFrame r)
 		{
 			return l.AsTimeSpan == r.AsTimeSpan;

@@ -28,12 +28,11 @@
 
 		public async Task<Fragment<TCandle>> Get1mCandles(
 			string symbol,
-			CandleRange? req,
-			Action<int, int>? tellProgress = null
+			CandleRange? req
 		)
 		{
 			req ??= CandleRange.AllByNow();
-			await BufferizeMissedCandlesIfNeed(symbol, req, tellProgress);
+			await BufferizeMissedCandlesIfNeed(symbol, req);
 			var candles = GetFromBuffer(symbol, req);
 			Fragment<TCandle> frag = new(candles.ToArray(), TimeFrame.OneMinute);
 			return frag;
@@ -55,7 +54,7 @@
 			if (maybeRange is null)
 			{
 				// Load All from internet
-				await LoadPartially(symbol, req.ToDescendingChunks(chunkSize), tellProgress);
+				await LoadPartially(symbol, req.ToDescendingChunks(chunkSize));
 				return;
 			}
 
@@ -63,25 +62,24 @@
 			if (req.StartUTC < oldRange.StartUTC)
 			{
 				CandleRange tail = new(req.StartUTC, oldRange.StartUTC);
-				await LoadPartially(symbol, tail.ToDescendingChunks(chunkSize), tellProgress);
+				await LoadPartially(symbol, tail.ToDescendingChunks(chunkSize));
 			}
 			if (req.EndUTC > oldRange.EndUTC)
 			{
 				CandleRange head = new(oldRange.EndUTC, req.EndUTC);
-				await LoadPartially(symbol, head.ToAscendingChunks(chunkSize), tellProgress);
+				await LoadPartially(symbol, head.ToAscendingChunks(chunkSize));
 			}
 		}
 
 
 		private async Task LoadPartially(
 			string symbol,
-			IList<CandleRange> ranges,
-			Action<int, int>? tellProgress
+			IList<CandleRange> ranges
 		)
 		{
 			foreach (var range in ranges)
 			{
-				var candles = await _alternativeSource.Get1mCandles(symbol, range, tellProgress);
+				var candles = await _alternativeSource.Get1mCandles(symbol, range);
 				Save(symbol, candles.GetCandles());
 			}
 		}

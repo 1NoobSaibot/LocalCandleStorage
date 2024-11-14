@@ -4,8 +4,7 @@
 	{
 		Task<Fragment<TCandle>> Get1mCandles(
 			string symbolId,
-			CandleRange? req = null,
-			Action<int, int>? tellProgress = null
+			CandleRange? req = null
 		);
 	}
 }
