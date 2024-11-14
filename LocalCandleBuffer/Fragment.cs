@@ -67,6 +67,32 @@
 		}
 
 
+		public Fragment<TCandle> Join(Fragment<TCandle> anotherFrag)
+		{
+			if (this.TimeFrame != anotherFrag.TimeFrame)
+			{
+				throw new ArgumentException("Fragments must have the same TimeFrame");
+			}
+
+			if (this.IsEmpty)
+			{
+				return anotherFrag;
+			}
+			if (anotherFrag.IsEmpty)
+			{
+				return this;
+			}
+
+			// TODO: Gluing is not such efficient when fragments has no intersections
+			return new Fragment<TCandle>(
+				SimpleCandleRepair
+					.Glue(this._m, anotherFrag._m)
+					.ToArray(),
+				TimeFrame
+			);
+		}
+
+
 		public TCandle this[int i]
 		{
 			get => _m[i];
