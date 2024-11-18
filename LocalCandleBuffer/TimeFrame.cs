@@ -34,5 +34,21 @@
 		{
 			return l.AsTimeSpan != r.AsTimeSpan;
 		}
+
+
+		public override bool Equals(object? obj)
+		{
+			if (obj is TimeFrame tf)
+			{
+				return this == tf;
+			}
+			return false;
+		}
+
+
+		public override int GetHashCode()
+		{
+			return AsTimeSpan.GetHashCode();
+		}
 	}
 }

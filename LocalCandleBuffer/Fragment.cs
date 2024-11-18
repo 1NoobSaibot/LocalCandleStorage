@@ -153,6 +153,12 @@ namespace LocalCandleBuffer
 		}
 
 
+		public static Fragment<TCandle> Empty(TimeFrame tf)
+		{
+			return new([], tf);
+		}
+
+
 		public TCandle this[int i]
 		{
 			get => _m[i];
