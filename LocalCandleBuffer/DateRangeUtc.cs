@@ -5,13 +5,15 @@ namespace LocalCandleBuffer
 	// Describes the range of candles where the first candle OpenUtc is equal or greater than StartUTC
 	// and the last candle OpenUtc is smaller or equal to EndUTC.
 	// Range with single candle have StartUTC == EndUTC
-	public class CandleRange
+	public class DateRangeUtc
 	{
 		public readonly DateTime StartUTC;
 		public readonly DateTime EndUTC;
 
+		private static readonly DateTime MIN_UTC_VALUE = new(0, DateTimeKind.Utc);
 
-		public CandleRange(DateTime startUTC, DateTime endUTC)
+
+		public DateRangeUtc(DateTime startUTC, DateTime endUTC)
 		{
 			if (startUTC.Kind != DateTimeKind.Utc)
 			{
@@ -40,52 +42,24 @@ namespace LocalCandleBuffer
 		}
 
 
-		public int GetLengthInMinutes()
-		{
-			return (int)(EndUTC - StartUTC).TotalMinutes;
-		}
-
-
 		public bool InRange<TCandle>(TCandle candle) where TCandle : IStorableCandle<TCandle>
 		{
 			return candle.OpenUtc >= StartUTC && candle.OpenUtc < EndUTC;
 		}
 
 
-		public bool DoesTouch(CandleRange anotherRange)
+		public bool DoesTouch(DateRangeUtc anotherRange)
 		{
-			return this.EndUTC >= anotherRange.StartUTC
-				|| anotherRange.EndUTC >= this.StartUTC;
+			return this.StartUTC <= anotherRange.EndUTC
+				&& anotherRange.StartUTC <= this.EndUTC;
 		}
 
 
-		public IList<CandleRange> ToDescendingChunks(TimeSpan chunkSize)
-		{
-			DateTime localEnd = EndUTC;
-			DateTime localStart = localEnd - chunkSize;
-			List<CandleRange> frags = [];
-
-			while (localStart >= StartUTC)
-			{
-				frags.Add(new(localStart, localEnd));
-				localEnd = localStart;
-				localStart = localEnd - chunkSize;
-			}
-
-			if (localEnd > StartUTC || frags.Count == 0)
-			{
-				frags.Add(new(StartUTC, localEnd));
-			}
-
-			return frags;
-		}
-
-
-		public IList<CandleRange> ToAscendingChunks(TimeSpan chunkSize)
+		public IList<DateRangeUtc> ToAscendingChunks(TimeSpan chunkSize)
 		{
 			DateTime localStart = StartUTC;
 			DateTime localEnd = localStart + chunkSize;
-			List<CandleRange> frags = [];
+			List<DateRangeUtc> frags = [];
 
 			while (localEnd <= EndUTC)
 			{
@@ -102,13 +76,60 @@ namespace LocalCandleBuffer
 			return frags;
 		}
 
-		public static CandleRange AllByNow()
+		public static DateRangeUtc AllByNow()
 		{
 			DateTime utcMinValue = new DateTime(1980, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 			return new(
 				utcMinValue,
 				DateTime.UtcNow.RoundDownToMinutes()
 			);
+		}
+
+
+		public DateRangeUtc Extend(DateRangeUtc another)
+		{
+			DateTime extendedStart = this.StartUTC < another.StartUTC
+				? this.StartUTC
+				: another.StartUTC;
+			DateTime extendedEnd = this.EndUTC > another.EndUTC
+				? this.EndUTC
+				: another.EndUTC;
+
+			return new(extendedStart, extendedEnd);
+		}
+
+
+		public bool IsWiderThan(DateRangeUtc another)
+		{
+			return (this.StartUTC < another.StartUTC && this.EndUTC >= another.EndUTC)
+				|| (this.StartUTC <= another.StartUTC && this.EndUTC > another.EndUTC);
+		}
+
+
+		public static DateRangeUtc All(TimeFrame tf)
+		{
+			long maxTicks = DateTime.MaxValue.Ticks;
+			DateTime maxUtc = new(maxTicks - (maxTicks % tf.AsTimeSpan.Ticks), DateTimeKind.Utc);
+			return new(MIN_UTC_VALUE, maxUtc);
+		}
+
+
+		public static DateRangeUtc Until(DateTime endDateUtc)
+		{
+			return new DateRangeUtc(MIN_UTC_VALUE, endDateUtc);
+		}
+
+
+		public void Validate<TCandle>(Fragment<TCandle> frag) where TCandle : IStorableCandle<TCandle>
+		{
+			if (frag.StartUtc < StartUTC)
+			{
+				throw new ArgumentException($"The fragment doesn't match {nameof(StartUTC)}-param.");
+			}
+			if (frag.EndUtc > EndUTC)
+			{
+				throw new ArgumentException($"The fragment doesn't match {nameof(EndUTC)}-param.");
+			}
 		}
 	}
 }

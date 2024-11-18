@@ -1,4 +1,4 @@
-using LocalCandleBuffer;
+using LocalCandleBuffer.Storages.Fragmented;
 using LocalCandleBufferTest.Fakes;
 using LocalCandleBufferTest.Implementations;
 
@@ -8,18 +8,18 @@ namespace LocalCandleBufferTest
 	public class FragmentaryCandleStorageTest
 	{
 		[TestMethod]
-		public void WritesAndReads()
+		public async Task WritesAndReads()
 		{
-			var candles = FakeExchangeApi.Instance.GetAllCandles();
+			var candles = await FakeExchangeApi.Instance.GetAllCandles();
 			Assert.IsNotNull(candles);
 			Assert.IsTrue(candles.Count >= 4200);
 #pragma warning disable IDE0059
 			var firstApiCandle = candles.First();
 			var lastApiCandle = candles.Last();
 
-			FragmentaryCandleStorage<Candle> storage = new(FakeExchangeApi.Instance, "testFragmentaryCandleFolderV2");
-			storage.Save(candles);
-			var readCandles = storage.Read(FakeExchangeApi.AvailableRange);
+			FragmentedCandleStorage<Candle> storage = new FragmentedStorage("testFragmentaryCandleFolderV2");
+			await storage.Save(candles);
+			var readCandles = await storage.Get1mCandles(FakeExchangeApi.AvailableRange);
 			var firstStorageCandle = readCandles.First();
 			var lastStorageCandle = readCandles.Last();
 #pragma warning restore IDE0059

@@ -1,14 +1,16 @@
 ﻿using LocalCandleBuffer;
+using LocalCandleBuffer.Buffering.Multiple;
+using LocalCandleBuffer.Storages;
 using LocalCandleBufferTest.Implementations;
 
 namespace LocalCandleBufferTest.Fakes
 {
-	internal class FakeExchangeApi : ICandleSource<Candle>, ICandleWritterReader<Candle>
+	internal class FakeExchangeApi : IMultipleChartSource<Candle>
 	{
 		private const string FILE_NAME = "../../../../CandleExample_2023.bin";
 		private readonly BinaryCandleStorage<Candle> _storage;
 		public static readonly FakeExchangeApi Instance = new FakeExchangeApi();
-		public static readonly CandleRange AvailableRange = new(
+		public static readonly DateRangeUtc AvailableRange = new(
 			new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 			new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
 		);
@@ -16,50 +18,31 @@ namespace LocalCandleBufferTest.Fakes
 
 		private FakeExchangeApi()
 		{
-			_storage = new(this, FILE_NAME);
+			_storage = new FileStorage(FILE_NAME);
 		}
 
 
-		public Task<Fragment<Candle>> Get1mCandles(
+		public async Task<Fragment<Candle>> Get1mCandles(
 			string symbolId,
-			CandleRange? req = null
+			DateRangeUtc? req = null
 		)
 		{
-			req ??= CandleRange.AllByNow();
-			var candles = _storage.Read(req);
+			req ??= DateRangeUtc.AllByNow();
+			var candles = await _storage.Get1mCandles(req);
 			Fragment<Candle> frag = new(candles.ToArray(), TimeFrame.OneMinute);
-			return Task.FromResult(frag);
+			return frag;
 		}
 
 
-		public IList<Candle> GetAllCandles()
+		public Task<Fragment<Candle>> GetAllCandles()
 		{
-			return _storage.ReadAll();
-		}
-
-		public void WriteSingleCandleToFiler(Candle candle, BinaryWriter writer)
-		{
-			writer.Write(candle.Open);
-			writer.Write(candle.High);
-			writer.Write(candle.Low);
-			writer.Write(candle.Close);
-			writer.Write(candle.OpenUnixMc);
-			writer.Write(candle.VolumeBase);
-			writer.Write(candle.VolumeQuote);
+			return _storage.Get1mCandles(DateRangeUtc.All(TimeFrame.OneMinute));
 		}
 
 
-		public Candle ReadSingleCandleFromFile(BinaryReader reader)
+		public Task<Fragment<Candle>> GetAll1mCandlesBefore(string symbolId, DateTime endDateUtc)
 		{
-			return new Candle(
-				open: reader.ReadSingle(),
-				high: reader.ReadSingle(),
-				low: reader.ReadSingle(),
-				close: reader.ReadSingle(),
-				openUnixMc: reader.ReadInt64(),
-				volumeBase: reader.ReadSingle(),
-				volumeQuote: reader.ReadSingle()
-			);
+			throw new NotImplementedException();
 		}
 	}
 }
