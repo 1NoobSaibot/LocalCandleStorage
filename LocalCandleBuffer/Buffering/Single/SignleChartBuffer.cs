@@ -26,7 +26,7 @@ namespace LocalCandleBuffer.Buffering.Single
 			{
 				Fragment<TCandle> loaded = await _remouteSource.Get1mCandles(req);
 				req.Validate(loaded);
-				await _localStorage.Save(loaded);
+				await _localStorage.UpdateAndSave(loaded);
 				return loaded;
 			}
 
@@ -52,7 +52,7 @@ namespace LocalCandleBuffer.Buffering.Single
 
 			if (needToSave)
 			{
-				await _localStorage.Save(storedFrag);
+				await _localStorage.UpdateAndSave(storedFrag);
 			}
 
 			return storedFrag;

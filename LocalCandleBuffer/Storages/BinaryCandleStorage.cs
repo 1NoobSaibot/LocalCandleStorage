@@ -46,7 +46,7 @@ namespace LocalCandleBuffer.Storages
 		protected abstract int BytesPerCandle();
 
 
-		public async Task Save(Fragment<TCandle> newCandles)
+		public async Task UpdateAndSave(Fragment<TCandle> newCandles)
 		{
 			if (newCandles.IsEmpty)
 			{

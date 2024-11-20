@@ -5,6 +5,9 @@ namespace LocalCandleBuffer.Storages
 	public interface ICandleStorage<TCandle>
 		: ISingleCandleSource<TCandle> where TCandle : IStorableCandle<TCandle>
 	{
-		Task Save(Fragment<TCandle> newFragment);
+		/// <summary>
+		/// Merges old and new candles and saves them all
+		/// </summary>
+		Task UpdateAndSave(Fragment<TCandle> newFragment);
 	}
 }

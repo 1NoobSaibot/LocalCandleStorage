@@ -18,7 +18,7 @@ namespace LocalCandleBufferTest
 			var lastApiCandle = candles.Last();
 
 			FragmentedCandleStorage<Candle> storage = new FragmentedStorage("testFragmentaryCandleFolderV2");
-			await storage.Save(candles);
+			await storage.UpdateAndSave(candles);
 			var readCandles = await storage.Get1mCandles(FakeExchangeApi.AvailableRange);
 			var firstStorageCandle = readCandles.First();
 			var lastStorageCandle = readCandles.Last();

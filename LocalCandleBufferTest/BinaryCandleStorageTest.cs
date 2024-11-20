@@ -19,7 +19,7 @@ namespace LocalCandleBufferTest
 			Assert.IsTrue(candles.Count >= 2);
 
 			BinaryCandleStorage<Candle> storage = new FileStorage("testCandles.bin");
-			await storage.Save(candles);
+			await storage.UpdateAndSave(candles);
 
 			var readCandles = await storage.Get1mCandles(DateRangeUtc.All(TimeFrame.OneMinute));
 			Assert.AreEqual(candles.Count, readCandles.Count);

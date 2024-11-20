@@ -19,7 +19,7 @@ namespace LocalCandleBuffer.Storages.Fragmented
 
 		public async Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req)
 		{
-			Fragment<TCandle> res = new Fragment<TCandle>([], TimeFrame.OneMinute);
+			Fragment<TCandle> res = Fragment<TCandle>.Empty(TimeFrame.OneMinute);
 
 			DateTime indexYear = req.StartUTC.RoundDownToYear();
 			while (indexYear <= req.EndUTC)
@@ -34,7 +34,7 @@ namespace LocalCandleBuffer.Storages.Fragmented
 		}
 
 
-		public Task Save(Fragment<TCandle> candles)
+		public Task UpdateAndSave(Fragment<TCandle> candles)
 		{
 			if (candles.IsEmpty)
 			{
@@ -47,7 +47,7 @@ namespace LocalCandleBuffer.Storages.Fragmented
 			{
 				ICandleStorage<TCandle> yearStorage = DateToStorage(indexYear);
 				Fragment<TCandle> chunk = candles.Pick(new(indexYear, nextYear));
-				yearStorage.Save(chunk);
+				yearStorage.UpdateAndSave(chunk);
 
 				indexYear = nextYear;
 				nextYear = nextYear.AddYears(1);
