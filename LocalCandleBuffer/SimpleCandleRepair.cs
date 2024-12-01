@@ -52,7 +52,7 @@
 					continue;
 				}
 
-				if (newCandle.IsThisVolumeBiggerThan(oldCandle))
+				if (newCandle.IsThisCandleNewerThan(oldCandle))
 				{
 					joined.Add(newCandle);
 					wereUpdated = true;

@@ -159,6 +159,25 @@ namespace LocalCandleBuffer
 		}
 
 
+		public Fragment<TCandle> ConvertTimeFrame(TimeFrame targetTimeFrame)
+		{
+			if (this.TimeFrame.CanBeConvertedTo(targetTimeFrame) == false)
+			{
+				throw new ArgumentException("The fragment cannot be converted in new timeframe");
+			}
+
+			if (TimeFrame == targetTimeFrame)
+			{
+				return this;
+			}
+
+			return new Fragment<TCandle>(
+				Fragment<TCandle>.ConvertTimeFrame(_m, targetTimeFrame),
+				targetTimeFrame
+			);
+		}
+
+
 		public TCandle this[int i]
 		{
 			get => _m[i];
@@ -169,5 +188,47 @@ namespace LocalCandleBuffer
 		{
 			get => _m[i];
 		}
+
+
+		private static TCandle[] ConvertTimeFrame(TCandle[] baseChart, TimeFrame newTimeFrame)
+		{
+			if (baseChart.Length == 0)
+			{
+				return baseChart;
+			}
+
+			List<TCandle> res = new(baseChart.Length);
+
+			DateTime newOpenTime = newTimeFrame.RoundDateTimeDown(baseChart[0].OpenUtc);
+			TCandle buildingCandle = baseChart[0].ShiftOpenUtc(newOpenTime);
+
+			for (int i = 1; i < baseChart.Length; i++)
+			{
+				TCandle oldCandle = baseChart[i];
+				newOpenTime = newTimeFrame.RoundDateTimeDown(oldCandle.OpenUtc);
+
+				if (newOpenTime == buildingCandle.OpenUtc)
+				{
+					buildingCandle = buildingCandle.MergeWith(oldCandle);
+				}
+				else if (newOpenTime > buildingCandle.OpenUtc)
+				{
+					res.Add(buildingCandle);
+					buildingCandle = oldCandle.ShiftOpenUtc(newOpenTime);
+				}
+				else
+				{
+					// This problem could happen by one of next reasons:
+					// 1) The baseChart is not sorted in ascending mode
+					// 2) Rounding DateTime works wrong
+					// 3) Something wrong with code of the method
+					throw new Exception("Something went wrong!");
+				}
+			}
+
+			res.Add(buildingCandle);
+			return [.. res.ToArray()];
+		}
+
 	}
 }
