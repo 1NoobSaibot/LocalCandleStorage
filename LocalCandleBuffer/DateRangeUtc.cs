@@ -55,27 +55,6 @@ namespace LocalCandleBuffer
 		}
 
 
-		public IList<DateRangeUtc> ToAscendingChunks(TimeSpan chunkSize)
-		{
-			DateTime localStart = StartUTC;
-			DateTime localEnd = localStart + chunkSize;
-			List<DateRangeUtc> frags = [];
-
-			while (localEnd <= EndUTC)
-			{
-				frags.Add(new(localStart, localEnd));
-				localStart = localEnd;
-				localEnd = localStart + chunkSize;
-			}
-
-			if (localStart < EndUTC || frags.Count == 0)
-			{
-				frags.Add(new(localStart, EndUTC));
-			}
-
-			return frags;
-		}
-
 		public static DateRangeUtc AllByNow()
 		{
 			DateTime utcMinValue = new DateTime(1980, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -130,6 +109,22 @@ namespace LocalCandleBuffer
 			{
 				throw new ArgumentException($"The fragment doesn't match {nameof(EndUTC)}-param.");
 			}
+		}
+
+
+		public DateRangeUtc? GetCommonOrNull(DateRangeUtc another)
+		{
+			DateTime startUTC = this.StartUTC > another.StartUTC ? this.StartUTC : another.StartUTC;
+			DateTime endUTC = this.EndUTC < another.EndUTC ? this.EndUTC : another.EndUTC;
+			if (startUTC > endUTC)
+			{
+				return null;
+			}
+
+			return new DateRangeUtc(
+				startUTC: startUTC,
+				endUTC: endUTC
+			);
 		}
 	}
 }

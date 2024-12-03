@@ -21,11 +21,23 @@ namespace LocalCandleBuffer.Storages.Fragmented
 		{
 			Fragment<TCandle> res = Fragment<TCandle>.Empty(TimeFrame.OneMinute);
 
-			DateTime indexYear = req.StartUTC.RoundDownToYear();
-			while (indexYear <= req.EndUTC)
+			DateRangeUtc? bufferedRange = _manifest.GetBufferedRangeData();
+			if (bufferedRange is null)
+			{
+				return res;
+			}
+
+			DateRangeUtc? commonRange = bufferedRange.GetCommonOrNull(req);
+			if (commonRange is null)
+			{
+				return res;
+			}
+
+			DateTime indexYear = commonRange.StartUTC.RoundDownToYear();
+			while (indexYear <= commonRange.EndUTC)
 			{
 				ICandleStorage<TCandle> fragStorage = DateToStorage(indexYear);
-				Fragment<TCandle> chunk = await fragStorage.Get1mCandles(req);
+				Fragment<TCandle> chunk = await fragStorage.Get1mCandles(commonRange);
 				res = res.Join(chunk);
 				indexYear = indexYear.AddYears(1);
 			}
