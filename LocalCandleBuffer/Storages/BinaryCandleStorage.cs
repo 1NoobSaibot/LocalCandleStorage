@@ -1,4 +1,5 @@
-﻿
+﻿using LocalCandleBuffer.Types;
+
 namespace LocalCandleBuffer.Storages
 {
 	public abstract class BinaryCandleStorage<TCandle> : ICandleStorage<TCandle> where TCandle : IStorableCandle<TCandle>
@@ -38,6 +39,12 @@ namespace LocalCandleBuffer.Storages
 			}
 
 			return Task.FromResult<Fragment<TCandle>>(new([.. candles], TimeFrame.OneMinute));
+		}
+
+
+		public Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req, Limit limit)
+		{
+			throw new NotImplementedException();
 		}
 
 

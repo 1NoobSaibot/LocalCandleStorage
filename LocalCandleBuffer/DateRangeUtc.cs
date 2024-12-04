@@ -9,6 +9,8 @@ namespace LocalCandleBuffer
 	{
 		public readonly DateTime StartUTC;
 		public readonly DateTime EndUTC;
+		public TimeSpan TimeSpan => EndUTC - StartUTC;
+		public int LengthIn1mCandles => (int)TimeSpan.TotalMinutes;
 
 		private static readonly DateTime MIN_UTC_VALUE = new(0, DateTimeKind.Utc);
 
@@ -125,6 +127,20 @@ namespace LocalCandleBuffer
 				startUTC: startUTC,
 				endUTC: endUTC
 			);
+		}
+
+
+		public DateRangeUtc[] SplitBy(DateTime momentUtc)
+		{
+			if (momentUtc <= StartUTC || momentUtc >= EndUTC)
+			{
+				return [this];
+			}
+
+			return [
+				new(StartUTC, momentUtc),
+				new(momentUtc, EndUTC)
+			];
 		}
 	}
 }

@@ -32,6 +32,7 @@
 		}
 
 
+		// TODO: Make tests
 		public static DateTime RoundDownToYear(this DateTime input)
 		{
 			return new DateTime(
@@ -43,6 +44,18 @@
 				second: 0,
 				kind: input.Kind
 			);
+		}
+
+
+		// TODO: Make tests
+		public static DateTime RoundUpToYear(this DateTime input)
+		{
+			DateTime roundedDown = input.RoundDownToYear();
+			if (input > roundedDown)
+			{
+				return roundedDown.AddYears(1);
+			}
+			return roundedDown;
 		}
 	}
 }

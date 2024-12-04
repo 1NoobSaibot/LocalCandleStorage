@@ -1,4 +1,5 @@
 ﻿using LocalCandleBuffer.Buffering.Single;
+using LocalCandleBuffer.Types;
 
 namespace LocalCandleBuffer.Buffering.Multiple
 {
@@ -19,6 +20,12 @@ namespace LocalCandleBuffer.Buffering.Multiple
 		public Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req)
 		{
 			return _originalSource.Get1mCandles(_symbol, req);
+		}
+
+
+		public Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req, Limit limit)
+		{
+			return _originalSource.Get1mCandles(_symbol, req, limit);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using LocalCandleBuffer;
 using LocalCandleBuffer.Buffering.Multiple;
 using LocalCandleBuffer.Storages;
+using LocalCandleBuffer.Types;
 using LocalCandleBufferTest.Implementations;
 
 namespace LocalCandleBufferTest.Fakes
@@ -29,8 +30,18 @@ namespace LocalCandleBufferTest.Fakes
 		{
 			req ??= DateRangeUtc.AllByNow();
 			var candles = await _storage.Get1mCandles(req);
-			Fragment<Candle> frag = new(candles.ToArray(), TimeFrame.OneMinute);
+			Fragment<Candle> frag = new([.. candles], TimeFrame.OneMinute);
 			return frag;
+		}
+
+
+		public Task<Fragment<Candle>> Get1mCandles(
+			string symbolId,
+			DateRangeUtc req,
+			Limit limit
+		)
+		{
+			throw new NotImplementedException();
 		}
 
 

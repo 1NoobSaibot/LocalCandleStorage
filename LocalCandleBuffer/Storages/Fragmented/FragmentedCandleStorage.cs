@@ -1,4 +1,5 @@
 ﻿using LocalCandleBuffer.Helpers;
+using LocalCandleBuffer.Types;
 
 namespace LocalCandleBuffer.Storages.Fragmented
 {
@@ -43,6 +44,12 @@ namespace LocalCandleBuffer.Storages.Fragmented
 			}
 
 			return res;
+		}
+
+
+		public Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req, Limit limit)
+		{
+			throw new NotImplementedException();
 		}
 
 

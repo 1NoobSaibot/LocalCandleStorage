@@ -1,5 +1,6 @@
 ﻿using LocalCandleBuffer.Buffering.Single;
 using LocalCandleBuffer.Storages;
+using LocalCandleBuffer.Types;
 
 namespace LocalCandleBuffer.Buffering.Multiple
 {
@@ -25,6 +26,16 @@ namespace LocalCandleBuffer.Buffering.Multiple
 		{
 			ISingleCandleSource<TCandle> singleChartBuffer = GetLocalBuffer(symbol);
 			return await singleChartBuffer.Get1mCandles(req);
+		}
+
+
+		public async Task<Fragment<TCandle>> Get1mCandles(
+			string symbol,
+			DateRangeUtc req,
+			Limit limit
+		)
+		{
+			throw new NotImplementedException();
 		}
 
 
