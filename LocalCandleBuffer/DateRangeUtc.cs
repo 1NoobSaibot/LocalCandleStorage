@@ -103,6 +103,12 @@ namespace LocalCandleBuffer
 
 		public void Validate<TCandle>(Fragment<TCandle> frag) where TCandle : IStorableCandle<TCandle>
 		{
+			if (frag.IsEmpty)
+			{
+				// Empty fragment is always valid.
+				return;
+			}
+
 			if (frag.StartUtc < StartUTC)
 			{
 				throw new ArgumentException($"The fragment doesn't match {nameof(StartUTC)}-param.");
