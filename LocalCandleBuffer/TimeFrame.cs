@@ -18,6 +18,12 @@
 		public readonly TimeSpan AsTimeSpan;
 		public long Ticks => AsTimeSpan.Ticks;
 
+
+		public TimeFrame(long ticks)
+			: this(new TimeSpan(ticks))
+		{ }
+
+
 		public TimeFrame(TimeSpan timeSpan)
 		{
 			if (timeSpan <= TimeSpan.Zero)
