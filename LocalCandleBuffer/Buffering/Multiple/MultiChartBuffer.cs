@@ -29,7 +29,7 @@ namespace LocalCandleBuffer.Buffering.Multiple
 		}
 
 
-		public async Task<Fragment<TCandle>> Get1mCandles(
+		public Task<Fragment<TCandle>> Get1mCandles(
 			string symbol,
 			DateRangeUtc req,
 			Limit limit
