@@ -55,5 +55,10 @@ namespace LocalCandleBufferTest.Fakes
 		{
 			throw new NotImplementedException();
 		}
+
+		public Task<string[]> GetAvailableSymbols()
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
