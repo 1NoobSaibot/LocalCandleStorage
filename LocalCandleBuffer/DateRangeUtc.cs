@@ -148,5 +148,11 @@ namespace LocalCandleBuffer
 				new(momentUtc, EndUTC)
 			];
 		}
+
+
+		public override string ToString()
+		{
+			return $"[{StartUTC} - {EndUTC}]";
+		}
 	}
 }
