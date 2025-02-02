@@ -38,7 +38,10 @@
 
 			if (oldRange.DoesTouch(newRange) == false)
 			{
-				throw new Exception("Ranges must touch each other");
+				Exception ex = new($"Ranges must touch each other: {oldRange} {newRange}");
+				ex.Data.Add("Range1", oldRange);
+				ex.Data.Add("Range2", newRange);
+				throw ex;
 			}
 
 			DateRangeUtc extended = oldRange.Extend(newRange);
