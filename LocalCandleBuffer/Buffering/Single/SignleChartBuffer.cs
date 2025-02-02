@@ -34,14 +34,14 @@ namespace LocalCandleBuffer.Buffering.Single
 			if (req.StartUTC < storedFrag.StartUtc)
 			{
 				DateRangeUtc tailReq = new(req.StartUTC, storedFrag.StartUtc);
-				Fragment<TCandle> loadedTail = await LoadAndSave(tailReq);
+				Fragment<TCandle> loadedTail = await LoadAndSave(tailReq, fromEndToStart: true);
 				tailReq.Validate(loadedTail);
 				storedFrag = storedFrag.Join(loadedTail);
 			}
 			if (req.EndUTC > storedFrag.EndUtc)
 			{
 				DateRangeUtc headReq = new(storedFrag.EndUtc, req.EndUTC);
-				Fragment<TCandle> loadedHead = await LoadAndSave(headReq);
+				Fragment<TCandle> loadedHead = await LoadAndSave(headReq, fromEndToStart: false);
 				headReq.Validate(loadedHead);
 				storedFrag = storedFrag.Join(loadedHead);
 			}
@@ -56,7 +56,7 @@ namespace LocalCandleBuffer.Buffering.Single
 		}
 
 
-		private async Task<Fragment<TCandle>> LoadAndSave(DateRangeUtc range)
+		private async Task<Fragment<TCandle>> LoadAndSave(DateRangeUtc range, bool fromEndToStart = true)
 		{
 			const int MAX_CHUNK_SIZE = 1440 * 30;
 
@@ -66,7 +66,16 @@ namespace LocalCandleBuffer.Buffering.Single
 				return res;
 			}
 
-			Limit limit = Limit.FromTheEnd(MAX_CHUNK_SIZE);
+			Limit limit;
+			if (fromEndToStart)
+			{
+				limit = Limit.FromTheEnd(MAX_CHUNK_SIZE);
+			}
+			else
+			{
+				limit = Limit.FromTheStart(MAX_CHUNK_SIZE);
+			}
+
 			DateRangeUtc remainRange = range;
 			do
 			{
@@ -76,20 +85,38 @@ namespace LocalCandleBuffer.Buffering.Single
 				res = res.Join(loaded);
 				await _localStorage.UpdateAndSave(loaded);
 
-				if (
-					loaded.Count < MAX_CHUNK_SIZE
-					|| loaded.StartUtc == range.StartUTC
-				)
+				if (loaded.Count < MAX_CHUNK_SIZE)
 				{
-					/*
-						if we've got less candles than we asked then there is no more candles so stop loading.
-						if the start of the fragment is equal to the start of requested range,
-						then we loaded all we requested.
-					*/
+					// Probably we loaded all the candles we wanted.
 					return res;
 				}
 
-				remainRange = new(remainRange.StartUTC, endUTC: loaded.StartUtc);
+				if (fromEndToStart)
+				{
+					if (loaded.StartUtc == range.StartUTC)
+					{
+						// We reached the start of the requested range.
+						return res;
+					}
+					else
+					{
+						// Need to cut range from the end and keep loading.
+						remainRange = new(remainRange.StartUTC, endUTC: loaded.StartUtc);
+					}
+				}
+				else
+				{
+					if (loaded.EndUtc == range.EndUTC)
+					{
+						// We reached the end of the requested range.
+						return res;
+					}
+					else
+					{
+						// Need to cut range from the start and keep loading.
+						remainRange = new(startUTC: loaded.EndUtc, remainRange.EndUTC);
+					}
+				}
 			}
 			while (true);
 		}
