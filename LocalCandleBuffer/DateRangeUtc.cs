@@ -59,7 +59,7 @@ namespace LocalCandleBuffer
 
 		public static DateRangeUtc AllByNow()
 		{
-			DateTime utcMinValue = new DateTime(1980, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+			DateTime utcMinValue = new(1980, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 			return new(
 				utcMinValue,
 				DateTime.UtcNow.RoundDownToMinutes()

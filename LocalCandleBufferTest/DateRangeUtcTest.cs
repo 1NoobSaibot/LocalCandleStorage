@@ -20,7 +20,7 @@ namespace LocalCandleBufferTest
 			Assert.AreEqual(expected, range1.DoesTouch(range2));
 			Assert.AreEqual(expected, range2.DoesTouch(range1));
 
-			DateTime IntToDate(int val)
+			static DateTime IntToDate(int val)
 			{
 				return new DateTime(2000, 1, 1, val, 0, 0, DateTimeKind.Utc);
 			}

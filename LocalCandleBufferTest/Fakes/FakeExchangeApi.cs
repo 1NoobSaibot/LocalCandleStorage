@@ -10,7 +10,7 @@ namespace LocalCandleBufferTest.Fakes
 	{
 		private const string FILE_NAME = "../../../../CandleExample_2023.bin";
 		private readonly BinaryCandleStorage<Candle> _storage;
-		public static readonly FakeExchangeApi Instance = new FakeExchangeApi();
+		public static readonly FakeExchangeApi Instance = new();
 		public static readonly DateRangeUtc AvailableRange = new(
 			new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 			new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
