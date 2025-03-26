@@ -95,9 +95,7 @@ namespace LocalCandleBuffer
 
 			// TODO: Gluing is not such efficient when fragments has no intersections
 			return new Fragment<TCandle>(
-				SimpleCandleRepair
-					.Glue(this._m, anotherFrag._m)
-					.ToArray(),
+				[.. SimpleCandleRepair.Glue(this._m, anotherFrag._m)],
 				TimeFrame
 			);
 		}
