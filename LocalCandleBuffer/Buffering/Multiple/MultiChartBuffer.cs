@@ -25,7 +25,7 @@ namespace LocalCandleBuffer.Buffering.Multiple
 			DateRangeUtc req
 		)
 		{
-			ISingleCandleSource<TCandle> singleChartBuffer = GetLocalBuffer(symbol);
+			SingleChartBuffer<TCandle> singleChartBuffer = GetLocalBuffer(symbol);
 			return await singleChartBuffer.Get1mCandles(req);
 		}
 
@@ -51,7 +51,7 @@ namespace LocalCandleBuffer.Buffering.Multiple
 		protected abstract ICandleStorage<TCandle> BuildStorage(string path);
 		public abstract string[] GetAvailableSymbolsLocal();
 
-		private ISingleCandleSource<TCandle> GetLocalBuffer(string symbol)
+		private SingleChartBuffer<TCandle> GetLocalBuffer(string symbol)
 		{
 			string storagePath = Path.Combine(Root, symbol);
 			MultipleToSingleChartSourceAdapter<TCandle> wrapedRemoteSource = new(_alternativeSource, symbol);
