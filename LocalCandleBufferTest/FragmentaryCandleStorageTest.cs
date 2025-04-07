@@ -33,7 +33,7 @@ namespace LocalCandleBufferTest
 			}
 
 			int smallestCount = Math.Min(candles.Count, readCandles.Count);
-			for (int i = 0; i < smallestCount; i++)
+			foreach (int i in smallestCount)
 			{
 				var candle = candles[i];
 				var readCandle = readCandles[i];

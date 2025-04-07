@@ -120,7 +120,7 @@ namespace LocalCandleBuffer
 		{
 			// TODO: make it faster
 			int startIndex = 0;
-			for (int i = 0; i < _m.Length; i++)
+			foreach (int i in _m.Length)
 			{
 				if (_m[i].OpenUtc >= range.StartUTC)
 				{
@@ -143,7 +143,7 @@ namespace LocalCandleBuffer
 			}
 
 			TCandle[] res = new TCandle[count];
-			for (int i = 0; i < count; i++)
+			foreach (int i in count)
 			{
 				res[i] = _m[i + startIndex];
 			}

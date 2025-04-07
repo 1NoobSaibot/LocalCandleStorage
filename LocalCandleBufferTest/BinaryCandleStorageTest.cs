@@ -23,7 +23,7 @@ namespace LocalCandleBufferTest
 
 			var readCandles = await storage.Get1mCandles(DateRangeUtc.All(TimeFrame.OneMinute));
 			Assert.AreEqual(candles.Count, readCandles.Count);
-			for (int i = 0; i < readCandles.Count; i++)
+			foreach (int i in readCandles.Count)
 			{
 				Assert.AreEqual(candles[i].Open, readCandles[i].Open);
 				Assert.AreEqual(candles[i].High, readCandles[i].High);
