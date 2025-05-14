@@ -1,13 +1,15 @@
-﻿namespace LocalCandleBuffer.Storages.Fragmented
+﻿using SafeFile.Atomic;
+
+namespace LocalCandleBuffer.Storages.Fragmented
 {
 	internal class Manifest<TCandle> where TCandle : IStorableCandle<TCandle>
 	{
-		private readonly string _filePath;
+		private readonly AtomicFileStorage _storage;
 
 
 		public Manifest(string filePath)
 		{
-			_filePath = filePath;
+			_storage = new(filePath);
 		}
 
 
@@ -54,24 +56,26 @@
 
 		private DateRangeUtc? Load()
 		{
-			if (File.Exists(_filePath) == false)
-			{
-				return null;
-			}
-
-			using BinaryReader reader = new(new FileStream(_filePath, FileMode.Open));
-			DateTime startUtc = new(reader.ReadInt64(), DateTimeKind.Utc);
-			DateTime endUtc = new(reader.ReadInt64(), DateTimeKind.Utc);
-			return new(startUtc, endUtc);
+			_storage.TryRead<DateRangeUtc>(
+				reader =>
+				{
+					DateTime startUtc = new(reader.ReadInt64(), DateTimeKind.Utc);
+					DateTime endUtc = new(reader.ReadInt64(), DateTimeKind.Utc);
+					return new(startUtc, endUtc);
+				},
+				out DateRangeUtc? range
+			);
+			return range;
 		}
 
 
 		private void Save(DateRangeUtc range)
 		{
-			using BinaryWriter writer = new(new FileStream(_filePath, FileMode.Create));
-			writer.Write(range.StartUTC.Ticks);
-			writer.Write(range.EndUTC.Ticks);
-			writer.Flush();
+			_storage.WriteAndSave(writer =>
+			{
+				writer.Write(range.StartUTC.Ticks);
+				writer.Write(range.EndUTC.Ticks);
+			});
 		}
 	}
 }
