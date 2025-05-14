@@ -19,7 +19,7 @@ namespace LocalCandleBufferTest.Fakes
 
 		private FakeExchangeApi()
 		{
-			_storage = new FileStorage(FILE_NAME);
+			_storage = new FileStorage(FILE_NAME, TimeFrame.OneMinute);
 		}
 
 

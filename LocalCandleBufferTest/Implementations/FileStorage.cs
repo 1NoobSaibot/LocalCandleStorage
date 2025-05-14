@@ -1,11 +1,12 @@
-﻿using LocalCandleBuffer.Storages;
+﻿using LocalCandleBuffer;
+using LocalCandleBuffer.Storages;
 
 namespace LocalCandleBufferTest.Implementations
 {
 	internal class FileStorage : BinaryCandleStorage<Candle>
 	{
-		public FileStorage(string path)
-			: base(path)
+		public FileStorage(string path, TimeFrame baseTimeFrame)
+			: base(path, baseTimeFrame)
 		{ }
 
 

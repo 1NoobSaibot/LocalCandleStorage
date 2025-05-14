@@ -14,4 +14,8 @@
 	  <PackageReference Include="ElegantLoops" Version="1.0.1" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\..\SafeFile\SafeFile\SafeFile.csproj" />
+	</ItemGroup>
+
 </Project>

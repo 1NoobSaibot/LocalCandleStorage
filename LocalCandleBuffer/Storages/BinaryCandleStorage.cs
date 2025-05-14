@@ -1,44 +1,57 @@
 ﻿using LocalCandleBuffer.Types;
+using SafeFile;
+using SafeFile.Atomic;
 
 namespace LocalCandleBuffer.Storages
 {
-	public abstract class BinaryCandleStorage<TCandle> : ICandleStorage<TCandle> where TCandle : IStorableCandle<TCandle>
+	public abstract class BinaryCandleStorage<TCandle> : ICandleStorage<TCandle>
+		where TCandle : IStorableCandle<TCandle>
 	{
-		private readonly string _path;
+		private readonly AtomicFileStorage _atomicFile;
+		public readonly TimeFrame BaseTimeFrame;
+		public string Path => _atomicFile.FileName;
 
 
-		public BinaryCandleStorage(string path)
+		public BinaryCandleStorage(string path, TimeFrame baseTimeFrame)
 		{
-			_path = path;
+			_atomicFile = new(path);
+			BaseTimeFrame = baseTimeFrame;
 		}
 
 
 		public Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req)
 		{
-			if (File.Exists(_path) == false)
+			if (_atomicFile.TryRead<Fragment<TCandle>>(
+				ReadCandlesFn,
+				out Fragment<TCandle>? readFragment
+			))
 			{
-				return Task.FromResult<Fragment<TCandle>>(new([], TimeFrame.OneMinute));
+				return Task.FromResult(readFragment!);
 			}
 
-			using BinaryReader reader = new(File.Open(_path, FileMode.Open));
-			List<TCandle> candles = new((int)(reader.BaseStream.Length / BytesPerCandle()));
-			while (reader.BaseStream.Position < reader.BaseStream.Length)
+			return Task.FromResult(Fragment<TCandle>.Empty(BaseTimeFrame));
+
+			Fragment<TCandle> ReadCandlesFn(SignedBinaryReader reader)
 			{
-				var candle = ReadSingleCandleFromFile(reader);
-
-				if (candle.OpenUtc < req.StartUTC)
+				List<TCandle> candles = new((int)(reader.BaseStream.Length / BytesPerCandle()));
+				while (reader.BaseStream.Position < reader.BaseStream.Length)
 				{
-					continue;
-				}
-				if (candle.OpenUtc >= req.EndUTC)
-				{
-					break;
+					var candle = ReadSingleCandleFromFile(reader);
+
+					if (candle.OpenUtc < req.StartUTC)
+					{
+						continue;
+					}
+					if (candle.OpenUtc >= req.EndUTC)
+					{
+						break;
+					}
+
+					candles.Add(candle);
 				}
 
-				candles.Add(candle);
+				return new Fragment<TCandle>([.. candles], BaseTimeFrame);
 			}
-
-			return Task.FromResult<Fragment<TCandle>>(new([.. candles], TimeFrame.OneMinute));
 		}
 
 
@@ -65,13 +78,13 @@ namespace LocalCandleBuffer.Storages
 
 			if (allCandles.Count > oldCandles.Count)
 			{
-				using BinaryWriter writer = new(File.Open(_path, FileMode.Create));
-				foreach (TCandle candle in newCandles)
+				_atomicFile.WriteAndSave((writer) =>
 				{
-					WriteSingleCandleToFile(writer, candle);
-				}
-
-				writer.Flush();
+					foreach (TCandle candle in newCandles)
+					{
+						WriteSingleCandleToFile(writer, candle);
+					}
+				});
 			}
 
 			return;
@@ -80,7 +93,7 @@ namespace LocalCandleBuffer.Storages
 
 		private Task<Fragment<TCandle>> ReadAll()
 		{
-			return Get1mCandles(DateRangeUtc.All(TimeFrame.OneMinute));
+			return Get1mCandles(DateRangeUtc.All(BaseTimeFrame));
 		}
 	}
 }

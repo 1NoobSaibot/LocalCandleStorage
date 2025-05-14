@@ -1,4 +1,5 @@
-﻿using LocalCandleBuffer.Storages;
+﻿using LocalCandleBuffer;
+using LocalCandleBuffer.Storages;
 using LocalCandleBuffer.Storages.Fragmented;
 
 namespace LocalCandleBufferTest.Implementations
@@ -12,7 +13,7 @@ namespace LocalCandleBufferTest.Implementations
 
 		protected override ICandleStorage<Candle> CreateStorage(string path)
 		{
-			return new FileStorage(path);
+			return new FileStorage(path, TimeFrame.OneMinute);
 		}
 	}
 }
