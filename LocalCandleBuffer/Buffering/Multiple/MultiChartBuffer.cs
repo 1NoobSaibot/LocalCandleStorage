@@ -20,13 +20,13 @@ namespace LocalCandleBuffer.Buffering.Multiple
 		}
 
 
-		public async Task<Fragment<TCandle>> Get1mCandles(
+		public Task<Fragment<TCandle>> Get1mCandles(
 			string symbol,
 			DateRangeUtc req
 		)
 		{
 			SingleChartBuffer<TCandle> singleChartBuffer = GetLocalBuffer(symbol);
-			return await singleChartBuffer.Get1mCandles(req);
+			return singleChartBuffer.Get1mCandles(req);
 		}
 
 
@@ -36,7 +36,8 @@ namespace LocalCandleBuffer.Buffering.Multiple
 			Limit limit
 		)
 		{
-			throw new NotImplementedException();
+			SingleChartBuffer<TCandle> singleChartBuffer = GetLocalBuffer(symbol);
+			return singleChartBuffer.Get1mCandles(req, limit);
 		}
 
 
