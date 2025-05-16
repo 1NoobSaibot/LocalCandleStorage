@@ -8,6 +8,7 @@ namespace LocalCandleBuffer
 		public readonly TimeFrame TimeFrame;
 
 		public bool IsEmpty => _m.Length == 0;
+		public bool IsNotEmpty => _m.Length > 0;
 		public int Count => _m.Length;
 		public DateTime StartUtc => IsEmpty
 			? throw new Exception($"Empty Fragment can't have a {nameof(StartUtc)} date")
@@ -15,7 +16,7 @@ namespace LocalCandleBuffer
 		public DateTime EndUtc => IsEmpty
 			? throw new Exception($"Empty Fragment can't have an {nameof(EndUtc)} date")
 			: (_m[^1].OpenUtc + TimeFrame.AsTimeSpan);
-		public DateRangeUtc AsDateRange => new(StartUtc, EndUtc);
+		public DateRangeUtc? AsDateRange => IsEmpty ? null : new(StartUtc, EndUtc);
 
 
 		public Fragment(TCandle[] candles, TimeFrame tf)
