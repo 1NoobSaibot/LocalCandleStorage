@@ -89,15 +89,29 @@ namespace LocalCandleBuffer
 
 		public static DateRangeUtc All(TimeFrame tf)
 		{
-			long maxTicks = DateTime.MaxValue.Ticks;
-			DateTime maxUtc = new(maxTicks - (maxTicks % tf.AsTimeSpan.Ticks), DateTimeKind.Utc);
+			DateTime maxUtc = GetMaxUtcValueForTimeFrame(tf);
 			return new(MIN_UTC_VALUE, maxUtc);
+		}
+
+
+		private static DateTime GetMaxUtcValueForTimeFrame(TimeFrame timeFrame)
+		{
+			long maxTicks = DateTime.MaxValue.Ticks;
+			DateTime maxUtc = new(maxTicks - (maxTicks % timeFrame.AsTimeSpan.Ticks), DateTimeKind.Utc);
+			return maxUtc;
 		}
 
 
 		public static DateRangeUtc Until(DateTime endDateUtc)
 		{
 			return new DateRangeUtc(MIN_UTC_VALUE, endDateUtc);
+		}
+
+
+		public static DateRangeUtc After(DateTime startDateUtc, TimeFrame targetTimeFrame)
+		{
+			DateTime maxUtc = GetMaxUtcValueForTimeFrame(targetTimeFrame);
+			return new DateRangeUtc(startUTC: startDateUtc, endUTC: maxUtc);
 		}
 
 
