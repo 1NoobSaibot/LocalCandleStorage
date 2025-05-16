@@ -1,3 +1,4 @@
+using LocalCandleBuffer;
 using LocalCandleBuffer.Storages.Fragmented;
 using LocalCandleBufferTest.Fakes;
 using LocalCandleBufferTest.Implementations;
@@ -17,9 +18,10 @@ namespace LocalCandleBufferTest
 			var firstApiCandle = candles.First();
 			var lastApiCandle = candles.Last();
 
-			FragmentedCandleStorage<Candle> storage = new FragmentedStorage("testFragmentaryCandleFolderV2");
+			FragmentedCandleStorage<Candle> storage
+				= new FragmentedStorage("testFragmentaryCandleFolderV2", TimeFrame.OneMinute);
 			await storage.UpdateAndSave(candles);
-			var readCandles = await storage.Get1mCandles(FakeExchangeApi.AvailableRange);
+			var readCandles = await storage.GetCandles(FakeExchangeApi.AvailableRange);
 			var firstStorageCandle = readCandles.First();
 			var lastStorageCandle = readCandles.Last();
 #pragma warning restore IDE0059

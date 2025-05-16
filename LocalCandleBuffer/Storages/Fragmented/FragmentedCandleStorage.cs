@@ -8,19 +8,28 @@ namespace LocalCandleBuffer.Storages.Fragmented
 	{
 		private readonly string _root;
 		private readonly Manifest<TCandle> _manifest;
+		public TimeFrame BaseTimeFrame { get; }
 
 
-		public FragmentedCandleStorage(string pathToFolder)
+		public FragmentedCandleStorage(string pathToFolder, TimeFrame baseTimeFrame)
 		{
 			_root = pathToFolder;
+			BaseTimeFrame = baseTimeFrame;
 			Directory.CreateDirectory(_root);
 			_manifest = new(Path.Combine(pathToFolder, ManifestFileName()));
+			BaseTimeFrame = baseTimeFrame;
 		}
 
 
-		public async Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req)
+		public Task<DateRangeUtc?> GetLoadedRange()
 		{
-			Fragment<TCandle> res = Fragment<TCandle>.Empty(TimeFrame.OneMinute);
+			return Task.FromResult(_manifest.GetBufferedRangeData());
+		}
+
+
+		public async Task<Fragment<TCandle>> GetCandles(DateRangeUtc req)
+		{
+			Fragment<TCandle> res = Fragment<TCandle>.Empty(BaseTimeFrame);
 
 			DateRangeUtc? bufferedRange = _manifest.GetBufferedRangeData();
 			if (bufferedRange is null)
@@ -38,7 +47,7 @@ namespace LocalCandleBuffer.Storages.Fragmented
 			while (indexYear <= commonRange.EndUTC)
 			{
 				ICandleStorage<TCandle> fragStorage = DateToStorage(indexYear);
-				Fragment<TCandle> chunk = await fragStorage.Get1mCandles(commonRange);
+				Fragment<TCandle> chunk = await fragStorage.GetCandles(commonRange);
 				res = res.Join(chunk);
 				indexYear = indexYear.AddYears(1);
 			}
@@ -47,7 +56,7 @@ namespace LocalCandleBuffer.Storages.Fragmented
 		}
 
 
-		public Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req, Limit limit)
+		public Task<Fragment<TCandle>> GetCandles(DateRangeUtc req, Limit limit)
 		{
 			throw new NotImplementedException();
 		}

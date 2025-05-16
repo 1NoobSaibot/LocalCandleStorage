@@ -4,15 +4,16 @@ using LocalCandleBuffer.Types;
 namespace LocalCandleBuffer.Buffering.Single
 {
 	public class SingleChartBuffer<TCandle>
-		: ISingleCandleSource<TCandle> where TCandle : IStorableCandle<TCandle>
+		: IChartSource<TCandle> where TCandle : IStorableCandle<TCandle>
 	{
-		private readonly ISingleCandleSource<TCandle> _remouteSource;
+		private readonly IChartSource<TCandle> _remouteSource;
 		private readonly ICandleStorage<TCandle> _localStorage;
+		public TimeFrame BaseTimeFrame => _remouteSource.BaseTimeFrame;
 
 
 		public SingleChartBuffer(
 			ICandleStorage<TCandle> localStorage,
-			ISingleCandleSource<TCandle> alternativeSource
+			IChartSource<TCandle> alternativeSource
 		)
 		{
 			_localStorage = localStorage;
@@ -20,9 +21,9 @@ namespace LocalCandleBuffer.Buffering.Single
 		}
 
 
-		public async Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req)
+		public async Task<Fragment<TCandle>> GetCandles(DateRangeUtc req)
 		{
-			Fragment<TCandle> storedFrag = await _localStorage.Get1mCandles(req);
+			Fragment<TCandle> storedFrag = await _localStorage.GetCandles(req);
 			if (storedFrag.IsEmpty)
 			{
 				Fragment<TCandle> loaded = await LoadAndSave(req);
@@ -50,9 +51,15 @@ namespace LocalCandleBuffer.Buffering.Single
 		}
 
 
-		public Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req, Limit limit)
+		public Task<Fragment<TCandle>> GetCandles(DateRangeUtc req, Limit limit)
 		{
 			throw new NotImplementedException();
+		}
+
+
+		public Task<DateRangeUtc?> GetLoadedRange()
+		{
+			return _localStorage.GetLoadedRange();
 		}
 
 
@@ -60,7 +67,7 @@ namespace LocalCandleBuffer.Buffering.Single
 		{
 			const int MAX_CHUNK_SIZE = 1440 * 30;
 
-			Fragment<TCandle> res = Fragment<TCandle>.Empty(TimeFrame.OneMinute);
+			Fragment<TCandle> res = Fragment<TCandle>.Empty(BaseTimeFrame);
 			if (range.LengthIn1mCandles == 0)
 			{
 				return res;
@@ -80,7 +87,7 @@ namespace LocalCandleBuffer.Buffering.Single
 			do
 			{
 				Fragment<TCandle> loaded = await _remouteSource
-					.Get1mCandles(remainRange, limit);
+					.GetCandles(remainRange, limit);
 				remainRange.Validate(loaded);
 				res = res.Join(loaded);
 				await _localStorage.UpdateAndSave(loaded);

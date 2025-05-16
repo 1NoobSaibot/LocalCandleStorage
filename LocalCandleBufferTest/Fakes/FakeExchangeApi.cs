@@ -1,12 +1,12 @@
 ﻿using LocalCandleBuffer;
-using LocalCandleBuffer.Buffering.Multiple;
+using LocalCandleBuffer.Buffering.ExchangeLevel;
 using LocalCandleBuffer.Storages;
 using LocalCandleBuffer.Types;
 using LocalCandleBufferTest.Implementations;
 
 namespace LocalCandleBufferTest.Fakes
 {
-	internal class FakeExchangeApi : IMultipleChartSource<Candle>
+	internal class FakeExchangeApi : IExchangeCandleSource<Candle>
 	{
 		private const string FILE_NAME = "../../../../CandleExample_2023.bin";
 		private readonly BinaryCandleStorage<Candle> _storage;
@@ -15,6 +15,8 @@ namespace LocalCandleBufferTest.Fakes
 			new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 			new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc)
 		);
+		public TimeFrame BaseTimeFrame => _storage.BaseTimeFrame;
+		public MarketType[] AvailableMarketTypes => [MarketType.Spot];
 
 
 		private FakeExchangeApi()
@@ -23,19 +25,21 @@ namespace LocalCandleBufferTest.Fakes
 		}
 
 
-		public async Task<Fragment<Candle>> Get1mCandles(
+		public async Task<Fragment<Candle>> GetCandles(
+			MarketType marketType,
 			string symbolId,
 			DateRangeUtc? req = null
 		)
 		{
 			req ??= DateRangeUtc.AllByNow();
-			var candles = await _storage.Get1mCandles(req);
+			var candles = await _storage.GetCandles(req);
 			Fragment<Candle> frag = new([.. candles], TimeFrame.OneMinute);
 			return frag;
 		}
 
 
-		public Task<Fragment<Candle>> Get1mCandles(
+		public Task<Fragment<Candle>> GetCandles(
+			MarketType marketType,
 			string symbolId,
 			DateRangeUtc req,
 			Limit limit
@@ -47,16 +51,11 @@ namespace LocalCandleBufferTest.Fakes
 
 		public Task<Fragment<Candle>> GetAllCandles()
 		{
-			return _storage.Get1mCandles(DateRangeUtc.All(TimeFrame.OneMinute));
+			return _storage.GetCandles(DateRangeUtc.All(TimeFrame.OneMinute));
 		}
 
 
-		public Task<Fragment<Candle>> GetAll1mCandlesBefore(string symbolId, DateTime endDateUtc)
-		{
-			throw new NotImplementedException();
-		}
-
-		public Task<string[]> GetAvailableSymbols()
+		public Task<string[]> GetAvailableSymbols(MarketType marketType)
 		{
 			throw new NotImplementedException();
 		}

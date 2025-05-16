@@ -8,7 +8,7 @@ namespace LocalCandleBuffer.Storages
 		where TCandle : IStorableCandle<TCandle>
 	{
 		private readonly AtomicFileStorage _atomicFile;
-		public readonly TimeFrame BaseTimeFrame;
+		public TimeFrame BaseTimeFrame { get; }
 		public string Path => _atomicFile.FileName;
 
 
@@ -19,7 +19,14 @@ namespace LocalCandleBuffer.Storages
 		}
 
 
-		public Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req)
+		public async Task<DateRangeUtc?> GetLoadedRange()
+		{
+			Fragment<TCandle> allCandles = await GetCandles(DateRangeUtc.All(BaseTimeFrame));
+			return allCandles.AsDateRange;
+		}
+
+
+		public Task<Fragment<TCandle>> GetCandles(DateRangeUtc req)
 		{
 			if (_atomicFile.TryRead<Fragment<TCandle>>(
 				ReadCandlesFn,
@@ -55,7 +62,7 @@ namespace LocalCandleBuffer.Storages
 		}
 
 
-		public Task<Fragment<TCandle>> Get1mCandles(DateRangeUtc req, Limit limit)
+		public Task<Fragment<TCandle>> GetCandles(DateRangeUtc req, Limit limit)
 		{
 			throw new NotImplementedException();
 		}
@@ -93,7 +100,7 @@ namespace LocalCandleBuffer.Storages
 
 		private Task<Fragment<TCandle>> ReadAll()
 		{
-			return Get1mCandles(DateRangeUtc.All(BaseTimeFrame));
+			return GetCandles(DateRangeUtc.All(BaseTimeFrame));
 		}
 	}
 }
