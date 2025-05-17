@@ -38,13 +38,13 @@
 				var oldCandle = oldFrag[indexOld];
 				var newCandle = newerFrag[indexNew];
 
-				if (oldCandle.OpenUnixMc < newCandle.OpenUnixMc)
+				if (oldCandle.OpenUnixMs < newCandle.OpenUnixMs)
 				{
 					joined.Add(oldCandle);
 					indexOld++;
 					continue;
 				}
-				if (newCandle.OpenUnixMc < oldCandle.OpenUnixMc)
+				if (newCandle.OpenUnixMs < oldCandle.OpenUnixMs)
 				{
 					joined.Add(newCandle);
 					indexNew++;

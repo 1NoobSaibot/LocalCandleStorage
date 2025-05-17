@@ -3,7 +3,7 @@
 	public interface IStorableCandle<TSelf> where TSelf : IStorableCandle<TSelf>
 	{
 		DateTime OpenUtc { get; }
-		long OpenUnixMc { get; }
+		long OpenUnixMs { get; }
 
 
 		/// <summary>

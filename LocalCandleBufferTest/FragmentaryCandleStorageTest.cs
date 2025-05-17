@@ -28,7 +28,7 @@ namespace LocalCandleBufferTest
 
 			for (int i = 1; i < readCandles.Count; i++)
 			{
-				if (readCandles[i - 1].OpenUnixMc >= readCandles[i].OpenUnixMc)
+				if (readCandles[i - 1].OpenUnixMs >= readCandles[i].OpenUnixMs)
 				{
 					Assert.Fail();
 				}

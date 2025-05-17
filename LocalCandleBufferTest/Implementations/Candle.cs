@@ -12,7 +12,7 @@ namespace LocalCandleBufferTest.Implementations
 		public readonly float VolumeQuote;
 
 		public DateTime OpenUtc { get; }
-		public long OpenUnixMc { get; }
+		public long OpenUnixMs { get; }
 
 
 		public Candle(
@@ -31,8 +31,8 @@ namespace LocalCandleBufferTest.Implementations
 			Close = close;
 			VolumeBase = volumeBase;
 			VolumeQuote = volumeQuote;
-			OpenUnixMc = openUnixMc;
-			OpenUtc = DateTimeOffset.FromUnixTimeMilliseconds(OpenUnixMc)
+			OpenUnixMs = openUnixMc;
+			OpenUtc = DateTimeOffset.FromUnixTimeMilliseconds(OpenUnixMs)
 				.UtcDateTime;
 		}
 
@@ -58,7 +58,7 @@ namespace LocalCandleBufferTest.Implementations
 			Close = close;
 			VolumeBase = volumeBase;
 			VolumeQuote = volumeQuote;
-			OpenUnixMc = new DateTimeOffset(openUtc, TimeSpan.Zero)
+			OpenUnixMs = new DateTimeOffset(openUtc, TimeSpan.Zero)
 				.ToUnixTimeMilliseconds();
 			OpenUtc = openUtc;
 		}
@@ -77,7 +77,7 @@ namespace LocalCandleBufferTest.Implementations
 				high: Math.Max(this.High, other.High),
 				low: Math.Min(this.Low, other.Low),
 				close: other.Close,
-				openUnixMc: this.OpenUnixMc,
+				openUnixMc: this.OpenUnixMs,
 				volumeBase: this.VolumeBase + other.VolumeBase,
 				volumeQuote: this.VolumeQuote + other.VolumeQuote
 			);

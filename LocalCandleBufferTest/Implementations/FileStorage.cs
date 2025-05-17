@@ -36,7 +36,7 @@ namespace LocalCandleBufferTest.Implementations
 			writer.Write(candle.High);
 			writer.Write(candle.Low);
 			writer.Write(candle.Close);
-			writer.Write(candle.OpenUnixMc);
+			writer.Write(candle.OpenUnixMs);
 			writer.Write(candle.VolumeBase);
 			writer.Write(candle.VolumeQuote);
 		}
