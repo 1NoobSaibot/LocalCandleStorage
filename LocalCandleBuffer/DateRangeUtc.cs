@@ -25,14 +25,6 @@ namespace LocalCandleBuffer
 			{
 				throw new ArgumentException("Kind of EndUTC must be UTC");
 			}
-			if (startUTC.IsRoundedToMinutes() == false)
-			{
-				throw new ArgumentException("StartUTC must be rounded to minutes");
-			}
-			if (endUTC.IsRoundedToMinutes() == false)
-			{
-				throw new ArgumentException("EndUTC must be rounded to minutes");
-			}
 
 			if (startUTC > endUTC)
 			{
@@ -167,6 +159,22 @@ namespace LocalCandleBuffer
 		public override string ToString()
 		{
 			return $"[{StartUTC} - {EndUTC}]";
+		}
+
+
+		public void WriteToBinaryWriter(BinaryWriter writer)
+		{
+			writer.Write(new DateTimeOffset(StartUTC).ToUnixTimeMilliseconds());
+			writer.Write(new DateTimeOffset(EndUTC).ToUnixTimeMilliseconds());
+		}
+
+
+		public static DateRangeUtc ReadFromBinaryReader(BinaryReader reader)
+		{
+			return new DateRangeUtc(
+				startUTC: DateTimeOffset.FromUnixTimeMilliseconds(reader.ReadInt64()).UtcDateTime,
+				endUTC: DateTimeOffset.FromUnixTimeMilliseconds(reader.ReadInt64()).UtcDateTime
+			);
 		}
 	}
 }
