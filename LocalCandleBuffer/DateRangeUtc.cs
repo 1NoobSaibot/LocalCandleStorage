@@ -94,9 +94,21 @@ namespace LocalCandleBuffer
 		}
 
 
+		public static DateRangeUtc Until(DateRangeUtc range)
+		{
+			return Until(endDateUtc: range.StartUTC);
+		}
+
+
 		public static DateRangeUtc Until(DateTime endDateUtc)
 		{
 			return new DateRangeUtc(MIN_UTC_VALUE, endDateUtc);
+		}
+
+
+		public static DateRangeUtc After(DateRangeUtc range, TimeFrame targetTimeFrame)
+		{
+			return After(startDateUtc: range.EndUTC, targetTimeFrame);
 		}
 
 
