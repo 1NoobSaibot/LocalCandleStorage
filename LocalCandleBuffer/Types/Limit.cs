@@ -31,9 +31,21 @@ namespace LocalCandleBuffer.Types
 		}
 
 
+		public static Limit MaxFromTheEnd()
+		{
+			return new(int.MaxValue, fromTheEnd: true);
+		}
+
+
+		public static Limit MaxFromTheStart()
+		{
+			return new(int.MaxValue, fromTheEnd: false);
+		}
+
+
 		public Limit Cut(int count)
 		{
-			return new Limit(this.OrientedCount - count, fromTheEnd: LoadFromStart);
+			return new Limit(OrientedCount - count, fromTheEnd: LoadFromEnd);
 		}
 	}
 }
