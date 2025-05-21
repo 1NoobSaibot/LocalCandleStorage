@@ -1,4 +1,4 @@
-﻿using LocalCandleBuffer.Buffering.Single;
+﻿using LocalCandleBuffer.Buffering.SymbolLevel;
 using LocalCandleBuffer.Types;
 
 namespace LocalCandleBuffer.Buffering.ExchangeLevel
@@ -16,6 +16,7 @@ namespace LocalCandleBuffer.Buffering.ExchangeLevel
 		{
 			_originalSource = source;
 			_symbol = symbol;
+			_marketType = marketType;
 		}
 
 

@@ -1,4 +1,4 @@
-﻿using LocalCandleBuffer.Buffering.Single;
+﻿using LocalCandleBuffer.Buffering.SymbolLevel;
 
 namespace LocalCandleBuffer.Storages
 {

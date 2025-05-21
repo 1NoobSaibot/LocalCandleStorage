@@ -81,7 +81,7 @@ namespace LocalCandleBuffer.Storages.Fragmented
 				nextYear = nextYear.AddYears(1);
 			} while (indexYear <= candles.Last().OpenUtc);
 
-			_manifest.UpdateRangeData(candles.AsDateRange);
+			_manifest.UpdateRangeData(candles.AsDateRange!);
 
 			return Task.CompletedTask;
 		}

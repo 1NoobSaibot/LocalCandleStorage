@@ -1,6 +1,6 @@
 ﻿using LocalCandleBuffer.Types;
 
-namespace LocalCandleBuffer.Buffering.Single
+namespace LocalCandleBuffer.Buffering.SymbolLevel
 {
 	public interface IChartSource<TCandle> where TCandle : IStorableCandle<TCandle>
 	{

@@ -1,7 +1,7 @@
 ﻿
 namespace LocalCandleBuffer.Types
 {
-	public struct Limit
+	public readonly struct Limit
 	{
 		public readonly bool LoadFromEnd;
 		public bool LoadFromStart => LoadFromEnd == false;

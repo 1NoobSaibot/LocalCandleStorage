@@ -1,7 +1,7 @@
 ﻿using LocalCandleBuffer.Storages;
 using LocalCandleBuffer.Types;
 
-namespace LocalCandleBuffer.Buffering.Single
+namespace LocalCandleBuffer.Buffering.SymbolLevel
 {
 	public class SingleChartBuffer<TCandle>
 		: IChartSource<TCandle> where TCandle : IStorableCandle<TCandle>
