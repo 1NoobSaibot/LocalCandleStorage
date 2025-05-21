@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using LocalCandleBuffer.Types;
+using System.Collections;
 
 namespace LocalCandleBuffer
 {
@@ -226,8 +227,39 @@ namespace LocalCandleBuffer
 			}
 
 			res.Add(buildingCandle);
-			return [.. res.ToArray()];
+			return [.. res];
 		}
 
+
+		public Fragment<TCandle> Pick(Limit limit)
+		{
+			if (limit.OrientedCount >= Count)
+			{
+				return this;
+			}
+
+			int startIndex = limit.LoadFromEnd
+				? (_m.Length - limit.OrientedCount)
+				: 0;
+			TCandle[] newArray = new TCandle[limit.OrientedCount];
+			Array.Copy(
+				sourceArray: _m,
+				sourceIndex: startIndex,
+				destinationArray: newArray,
+				destinationIndex: 0,
+				length: limit.OrientedCount
+			);
+			return new(newArray, TimeFrame);
+		}
+
+
+		public override string ToString()
+		{
+			if (IsEmpty)
+			{
+				return "Empty fragment";
+			}
+			return $"{Count} candles in range {AsDateRange!}";
+		}
 	}
 }
