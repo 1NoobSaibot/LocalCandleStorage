@@ -56,9 +56,11 @@ namespace LocalCandleBuffer.Storages.Fragmented
 		}
 
 
-		public Task<Fragment<TCandle>> GetCandles(DateRangeUtc req, Limit limit)
+		public async Task<Fragment<TCandle>> GetCandles(DateRangeUtc req, Limit limit)
 		{
-			throw new NotImplementedException();
+			// TODO: Make the method more efficient
+			var candles = await GetCandles(req);
+			return candles.Pick(limit);
 		}
 
 
@@ -74,7 +76,7 @@ namespace LocalCandleBuffer.Storages.Fragmented
 			do
 			{
 				ICandleStorage<TCandle> yearStorage = DateToStorage(indexYear);
-				Fragment<TCandle> chunk = candles.Pick(new(indexYear, nextYear));
+				Fragment<TCandle> chunk = candles.Pick(new DateRangeUtc(indexYear, nextYear));
 				yearStorage.UpdateAndSave(chunk);
 
 				indexYear = nextYear;
