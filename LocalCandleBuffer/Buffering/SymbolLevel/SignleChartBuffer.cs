@@ -51,9 +51,11 @@ namespace LocalCandleBuffer.Buffering.SymbolLevel
 		}
 
 
-		public Task<Fragment<TCandle>> GetCandles(DateRangeUtc req, Limit limit)
+		public async Task<Fragment<TCandle>> GetCandles(DateRangeUtc req, Limit limit)
 		{
-			throw new NotImplementedException();
+			// TODO: Make the method more efficient
+			var candles = await GetCandles(req);
+			return candles.Pick(limit);
 		}
 
 
